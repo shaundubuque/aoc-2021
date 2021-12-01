@@ -1,7 +1,3 @@
-use std::fs::File;
-use std::io::{self, BufRead};
-use std::path::Path;
-
 const EMPTY: i32 = -1;
 
 struct DepthCounter {
@@ -17,47 +13,40 @@ struct DepthHistoryCounter {
 
 #[cfg(test)]
 mod tests {
+    use super::super::util;
     use super::*;
+
+    fn get_sample_input() -> Vec<i32> {
+        util::read_input::<i32>("inputs/day1_sample.txt")
+    }
 
     #[test]
     fn test_part1_sample_input() -> Result<(), String> {
-        let sample_count = run_part1("inputs/day1_sample.txt");
+        let sample_input = get_sample_input();
+        let sample_count = run_part1(&sample_input);
         assert_eq!(7, sample_count);
         Ok(())
     }
 
     #[test]
     fn test_part2_sample_input() -> Result<(), String> {
-        let sample_count = run_part2("inputs/day1_sample.txt");
+        let sample_input = get_sample_input();
+        let sample_count = run_part2(&sample_input);
         assert_eq!(5, sample_count);
         Ok(())
     }
 }
 
-fn run_part1(filename: &str) -> i32 {
-    let depth_lines= read_lines(filename);
+pub fn run_part1(lines: &Vec<i32>) -> i32 {
     let acc = DepthCounter { prior_depth: i32::MAX, count: 0 };
-    let result = depth_lines.iter().cloned().fold(acc, |acc, depth_entry| compare_depth(acc, parse_entry(depth_entry)));
+    let result = lines.iter().fold(acc, |acc, &depth_entry| compare_depth(acc, depth_entry));
     result.count
 }
 
-fn run_part2(filename: &str) -> i32 {
-    let depth_lines= read_lines(filename);
+pub fn run_part2(lines: &Vec<i32>) -> i32 {
     let acc = DepthHistoryCounter { prior_depths: [EMPTY; 3], sum: 0, count: 0 };
-    let result = depth_lines.iter().cloned().fold(acc, |acc, depth_entry| compare_depth_history(acc, parse_entry(depth_entry)));
+    let result = lines.iter().fold(acc, |acc, &depth_entry| compare_depth_history(acc, depth_entry));
     result.count
-}
-
-fn main() {
-    let count = run_part1("inputs/day1.txt");
-    println!("PART 1 Result: {}", count);
-
-    let count = run_part2("inputs/day1.txt");
-    println!("PART 2 Result: {}", count);
-}
-
-fn parse_entry(depth_entry: String) -> i32 {
-    depth_entry.parse().unwrap_or(EMPTY)
 }
 
 fn compare_depth(mut counter: DepthCounter, depth: i32) -> DepthCounter {
@@ -102,13 +91,4 @@ fn compare_depth_history(mut counter: DepthHistoryCounter, depth: i32) -> DepthH
         }
         counter
     }
-}
-
-fn read_lines<P>(filename: P) -> Vec<String>
-    where P: AsRef<Path> {
-    let file = File::open(filename).expect("Error reading input file");
-    let lines = io::BufReader::new(file).lines();
-    lines
-        .map(|l| l.expect("Could not parse line"))
-        .collect()
 }
