@@ -36,15 +36,15 @@ mod tests {
 
 fn run_part1(filename: &str) -> i32 {
     let depth_lines= read_lines(filename);
-    let acc = DepthCounter { prior_depth: EMPTY, count: 0 };
-    let result = depth_lines.iter().cloned().fold(acc, |acc, depth_entry| check_depth(acc, parse_entry(depth_entry)));
+    let acc = DepthCounter { prior_depth: i32::MAX, count: 0 };
+    let result = depth_lines.iter().cloned().fold(acc, |acc, depth_entry| compare_depth(acc, parse_entry(depth_entry)));
     result.count
 }
 
 fn run_part2(filename: &str) -> i32 {
     let depth_lines= read_lines(filename);
     let acc = DepthHistoryCounter { prior_depths: [EMPTY; 3], sum: 0, count: 0 };
-    let result = depth_lines.iter().cloned().fold(acc, |acc, depth_entry| check_depth_history(acc, parse_entry(depth_entry)));
+    let result = depth_lines.iter().cloned().fold(acc, |acc, depth_entry| compare_depth_history(acc, parse_entry(depth_entry)));
     result.count
 }
 
@@ -60,7 +60,7 @@ fn parse_entry(depth_entry: String) -> i32 {
     depth_entry.parse().unwrap_or(EMPTY)
 }
 
-fn check_depth(mut counter: DepthCounter, depth: i32) -> DepthCounter {
+fn compare_depth(mut counter: DepthCounter, depth: i32) -> DepthCounter {
     if depth > counter.prior_depth {
         counter.count += 1;
     }
@@ -69,12 +69,14 @@ fn check_depth(mut counter: DepthCounter, depth: i32) -> DepthCounter {
 }
 
 fn shift_depths_left(counter: &mut DepthHistoryCounter, depth: i32) {
+    // extracted to make it easier to update to length agnostic solution
     counter.prior_depths[0] = counter.prior_depths[1];
     counter.prior_depths[1] = counter.prior_depths[2];
     counter.prior_depths[2] = depth;
 }
 
 fn sum_depths(counter: &DepthHistoryCounter) -> i32 {
+    // extracted to make it easier to update to length agnostic solution
     counter.prior_depths[0] + counter.prior_depths[1] + counter.prior_depths[2]
 }
 
@@ -83,16 +85,18 @@ fn update_with_depth(mut counter: &mut DepthHistoryCounter, depth: i32) {
     counter.sum = sum_depths(&counter);
 }
 
-fn check_depth_history(mut counter: DepthHistoryCounter, depth: i32) -> DepthHistoryCounter {
-    // doing direct lookup for speed, could use length agnostic filter to support history of arbitrary depth
-    if counter.prior_depths[0] == EMPTY || counter.prior_depths[1] == EMPTY || counter.prior_depths[2] == EMPTY {
-        // if either first 3 entries are empty, we need to continue accumulating
+fn has_missing_history(counter: &DepthHistoryCounter) -> bool {
+    counter.prior_depths[0] == EMPTY || counter.prior_depths[1] == EMPTY || counter.prior_depths[2] == EMPTY
+}
+
+fn compare_depth_history(mut counter: DepthHistoryCounter, depth: i32) -> DepthHistoryCounter {
+    if has_missing_history(&counter) {
+        // Keep accumulating
         update_with_depth(&mut counter, depth);
         counter
     } else {
         let prior_sum = counter.sum;
         update_with_depth(&mut counter, depth);
-
         if counter.sum > prior_sum {
             counter.count += 1;
         }
