@@ -1,5 +1,5 @@
 ## Approach
-I wanted to make use of fold to explore this syntax and challenges related to borrowing / mutability. 
+I wanted to make use of fold to explore this syntax and challenges related to borrowing / mutability. The solution would have been much simpler had I loops and offset indexes or zip. 
 
 Part 2 Extension: I'd like to extend my implementatino to support windows of variable length vs. 3 in current implementation. 
 
