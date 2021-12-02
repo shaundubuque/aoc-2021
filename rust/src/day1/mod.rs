@@ -21,32 +21,89 @@ mod tests {
     }
 
     #[test]
-    fn test_part1_sample_input() -> Result<(), String> {
+    fn test_part1_fold() -> Result<(), String> {
         let sample_input = get_sample_input();
-        let sample_count = run_part1(&sample_input);
+        let sample_count = run_part1_fold(&sample_input);
         assert_eq!(7, sample_count);
         Ok(())
     }
 
     #[test]
-    fn test_part2_sample_input() -> Result<(), String> {
+    fn test_part1_for() -> Result<(), String> {
         let sample_input = get_sample_input();
-        let sample_count = run_part2(&sample_input);
+        let sample_count = run_part1_for(&sample_input);
+        assert_eq!(7, sample_count);
+        Ok(())
+    }
+
+    #[test]
+    fn test_part2_fold() -> Result<(), String> {
+        let sample_input = get_sample_input();
+        let sample_count = run_part2_fold(&sample_input);
+        assert_eq!(5, sample_count);
+        Ok(())
+    }
+
+    #[test]
+    fn test_part2_for() -> Result<(), String> {
+        let sample_input = get_sample_input();
+        let sample_count = run_part2_for(&sample_input);
+        assert_eq!(5, sample_count);
+        Ok(())
+    }
+
+    #[test]
+    fn test_part1_zip() -> Result<(), String> {
+        let sample_input = get_sample_input();
+        let sample_count = run_generalized_zip(&sample_input, 1);
+        assert_eq!(7, sample_count);
+        Ok(())
+    }
+
+    #[test]
+    fn test_part2_zip() -> Result<(), String> {
+        let sample_input = get_sample_input();
+        let sample_count = run_generalized_zip(&sample_input, 3);
         assert_eq!(5, sample_count);
         Ok(())
     }
 }
 
-pub fn run_part1(lines: &Vec<i32>) -> i32 {
+pub fn run_part1_fold(lines: &Vec<i32>) -> i32 {
     let acc = DepthCounter { prior_depth: i32::MAX, count: 0 };
     let result = lines.iter().fold(acc, |acc, &depth_entry| compare_depth(acc, depth_entry));
     result.count
 }
 
-pub fn run_part2(lines: &Vec<i32>) -> i32 {
+pub fn run_part2_fold(lines: &Vec<i32>) -> i32 {
     let acc = DepthHistoryCounter { prior_depths: [EMPTY; 3], sum: 0, count: 0 };
     let result = lines.iter().fold(acc, |acc, &depth_entry| compare_depth_history(acc, depth_entry));
     result.count
+}
+
+pub fn run_part1_for(lines: &Vec<i32>) -> i32 {
+    let mut counter = 0;
+    for i in 1..lines.len() {
+        if lines[i] > lines[i-1] {
+            counter += 1;
+        }
+    }
+    counter
+}
+
+pub fn run_part2_for(lines: &Vec<i32>) -> i32 {
+    // start at index 3 (note, we can easily generalize this to any window length)
+    let mut counter = 0;
+    for i in 3..lines.len() {
+        if lines[i] > lines[i - 3] {
+            counter += 1;
+        }
+    }
+    counter
+}
+
+pub fn run_generalized_zip(depths: &Vec<i32>, offset: usize) -> i32 {
+    depths.iter().zip(depths.split_at(offset).1).filter( |(prev,curr)| curr > prev).count() as i32
 }
 
 fn compare_depth(mut counter: DepthCounter, depth: i32) -> DepthCounter {
