@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use crate::day2::{exec_moves, Move};
+use crate::day2::{exec_moves, exec_moves_with_aim, Move};
 
 mod day1;
 mod day2;
@@ -29,9 +29,19 @@ fn run_day_1() {
 }
 
 fn run_day2() {
-    let moves = util::read_input::<Move>("inputs/day2.txt");
-    let sub_location = exec_moves(moves);
-    println!("Sub Location: {}", sub_location);
+    fn part1() {
+        let moves = util::read_input::<Move>("inputs/day2.txt");
+        let sub_location = exec_moves(moves);
+        println!("Sub Location (Part 1): {}", sub_location);
+    }
+
+    fn part2() {
+        let moves = util::read_input::<Move>("inputs/day2.txt");
+        let sub_location = exec_moves_with_aim(moves);
+        println!("Sub Location (Part 2): {}", sub_location);
+    }
+    // part1();
+    part2()
 }
 
 fn main() {

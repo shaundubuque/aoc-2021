@@ -18,9 +18,10 @@ pub struct Move {
 }
 
 #[derive(Debug, Display)]
-#[display(fmt = "\n x: {} \n depth: {} \n total: {}", x, depth, "x*depth")]
+#[display(fmt = "\n x: {} \n aim: {} \n depth: {} \n total: {}", x, aim, depth, "x*depth")]
 pub struct SubPosition {
     x: i32,
+    aim: i32,
     depth: i32,
 }
 
@@ -91,16 +92,44 @@ mod tests {
         assert_eq!(sub_location.x, 15);
         assert_eq!(sub_location.depth, 10);
     }
+
+    #[test]
+    fn test_moving_with_aim() {
+        let moves = get_sample_input();
+        let sub_location = exec_moves_with_aim(moves);
+        assert_eq!(sub_location.x, 15);
+        assert_eq!(sub_location.depth, 60);
+    }
 }
 
 pub fn exec_moves(moves: Vec<Move>) -> SubPosition {
-    let mut sub_position = SubPosition { x: 0, depth: 0 };
+    let mut sub_position = SubPosition { x: 0, aim: 0, depth: 0 };
 
     for sub_move in moves {
         match sub_move.command {
             Command::Forward => sub_position.x += sub_move.value,
             Command::Down => sub_position.depth += sub_move.value,
             Command::Up => sub_position.depth -= sub_move.value,
+        }
+    }
+    sub_position
+}
+
+pub fn exec_moves_with_aim(moves: Vec<Move>) -> SubPosition {
+    let mut sub_position = SubPosition { x: 0, aim: 0, depth: 0 };
+
+    for sub_move in moves {
+        match sub_move.command {
+            Command::Forward => {
+                sub_position.x += sub_move.value;
+                sub_position.depth += sub_move.value * sub_position.aim;
+            },
+            Command::Down => {
+                sub_position.aim += sub_move.value;
+            },
+            Command::Up => {
+                sub_position.aim -= sub_move.value
+            },
         }
     }
     sub_position
