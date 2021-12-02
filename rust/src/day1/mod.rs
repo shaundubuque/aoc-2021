@@ -1,14 +1,16 @@
+#![allow(dead_code)]
+
 const EMPTY: i32 = -1;
 
 struct DepthCounter {
     prior_depth: i32,
-    count: i32
+    count: i32,
 }
 
 struct DepthHistoryCounter {
     prior_depths: [i32; 3],
     sum: i32,
-    count: i32
+    count: i32,
 }
 
 #[cfg(test)]
@@ -70,21 +72,32 @@ mod tests {
 }
 
 pub fn run_part1_fold(lines: &Vec<i32>) -> i32 {
-    let acc = DepthCounter { prior_depth: i32::MAX, count: 0 };
-    let result = lines.iter().fold(acc, |acc, &depth_entry| compare_depth(acc, depth_entry));
+    let acc = DepthCounter {
+        prior_depth: i32::MAX,
+        count: 0,
+    };
+    let result = lines
+        .iter()
+        .fold(acc, |acc, &depth_entry| compare_depth(acc, depth_entry));
     result.count
 }
 
 pub fn run_part2_fold(lines: &Vec<i32>) -> i32 {
-    let acc = DepthHistoryCounter { prior_depths: [EMPTY; 3], sum: 0, count: 0 };
-    let result = lines.iter().fold(acc, |acc, &depth_entry| compare_depth_history(acc, depth_entry));
+    let acc = DepthHistoryCounter {
+        prior_depths: [EMPTY; 3],
+        sum: 0,
+        count: 0,
+    };
+    let result = lines.iter().fold(acc, |acc, &depth_entry| {
+        compare_depth_history(acc, depth_entry)
+    });
     result.count
 }
 
 pub fn run_part1_for(lines: &Vec<i32>) -> i32 {
     let mut counter = 0;
     for i in 1..lines.len() {
-        if lines[i] > lines[i-1] {
+        if lines[i] > lines[i - 1] {
             counter += 1;
         }
     }
@@ -103,7 +116,11 @@ pub fn run_part2_for(lines: &Vec<i32>) -> i32 {
 }
 
 pub fn run_generalized_zip(depths: &Vec<i32>, offset: usize) -> i32 {
-    depths.iter().zip(depths.split_at(offset).1).filter( |(prev,curr)| curr > prev).count() as i32
+    depths
+        .iter()
+        .zip(depths.split_at(offset).1)
+        .filter(|(prev, curr)| curr > prev)
+        .count() as i32
 }
 
 fn compare_depth(mut counter: DepthCounter, depth: i32) -> DepthCounter {
@@ -132,7 +149,9 @@ fn update_with_depth(mut counter: &mut DepthHistoryCounter, depth: i32) {
 }
 
 fn has_missing_history(counter: &DepthHistoryCounter) -> bool {
-    counter.prior_depths[0] == EMPTY || counter.prior_depths[1] == EMPTY || counter.prior_depths[2] == EMPTY
+    counter.prior_depths[0] == EMPTY
+        || counter.prior_depths[1] == EMPTY
+        || counter.prior_depths[2] == EMPTY
 }
 
 fn compare_depth_history(mut counter: DepthHistoryCounter, depth: i32) -> DepthHistoryCounter {
