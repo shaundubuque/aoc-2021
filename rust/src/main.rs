@@ -4,6 +4,7 @@ use crate::day2::{exec_moves, exec_moves_with_aim, Move};
 
 mod day1;
 mod day2;
+mod day3;
 mod util;
 
 fn run_day_1() {
@@ -29,22 +30,23 @@ fn run_day_1() {
 }
 
 fn run_day2() {
-    fn part1() {
-        let moves = util::read_input::<Move>("inputs/day2.txt");
-        let sub_location = exec_moves(moves);
-        println!("Sub Location (Part 1): {}", sub_location);
-    }
+    let moves = util::read_input::<Move>("inputs/day2.txt");
+    let sub_location = exec_moves(&moves);
+    println!("Sub Location (Part 1): {}", sub_location);
 
-    fn part2() {
-        let moves = util::read_input::<Move>("inputs/day2.txt");
-        let sub_location = exec_moves_with_aim(moves);
-        println!("Sub Location (Part 2): {}", sub_location);
-    }
-    // part1();
-    part2()
+    let moves = util::read_input::<Move>("inputs/day2.txt");
+    let sub_location = exec_moves_with_aim(&moves);
+    println!("Sub Location (Part 2): {}", sub_location);
+}
+
+fn run_day3() {
+    let report = util::read_input::<String>("inputs/day3.txt");
+    let power_report = day3::get_power_report(&report);
+    println!("Power Report {}", power_report);
 }
 
 fn main() {
     // run_day_1();
-    run_day2();
+    // run_day2();
+    run_day3();
 }

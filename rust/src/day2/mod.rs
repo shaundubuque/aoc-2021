@@ -88,7 +88,7 @@ mod tests {
     #[test]
     fn test_moving() {
         let moves = get_sample_input();
-        let sub_location = exec_moves(moves);
+        let sub_location = exec_moves(&moves);
         assert_eq!(sub_location.x, 15);
         assert_eq!(sub_location.depth, 10);
     }
@@ -96,13 +96,13 @@ mod tests {
     #[test]
     fn test_moving_with_aim() {
         let moves = get_sample_input();
-        let sub_location = exec_moves_with_aim(moves);
+        let sub_location = exec_moves_with_aim(&moves);
         assert_eq!(sub_location.x, 15);
         assert_eq!(sub_location.depth, 60);
     }
 }
 
-pub fn exec_moves(moves: Vec<Move>) -> SubPosition {
+pub fn exec_moves(moves: &Vec<Move>) -> SubPosition {
     let mut sub_position = SubPosition { x: 0, aim: 0, depth: 0 };
 
     for sub_move in moves {
@@ -115,7 +115,7 @@ pub fn exec_moves(moves: Vec<Move>) -> SubPosition {
     sub_position
 }
 
-pub fn exec_moves_with_aim(moves: Vec<Move>) -> SubPosition {
+pub fn exec_moves_with_aim(moves: &Vec<Move>) -> SubPosition {
     let mut sub_position = SubPosition { x: 0, aim: 0, depth: 0 };
 
     for sub_move in moves {
