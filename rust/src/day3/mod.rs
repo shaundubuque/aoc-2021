@@ -67,17 +67,17 @@ fn oxygen_matcher(report: &Vec<String>, index: usize) -> u8 {
     fn compare(first: i32, second: i32) -> bool {
         return first < second
     }
-    common_bit_for_index(report, index, '1' as u8, compare)
+    matcher_bit_for_index(report, index, '1' as u8, compare)
 }
 
 fn co2_matcher(report: &Vec<String>, index: usize) -> u8 {
     fn compare(first: i32, second: i32) -> bool {
         return first > second
     }
-    common_bit_for_index(report, index, '0' as u8, compare)
+    matcher_bit_for_index(report, index, '0' as u8, compare)
 }
 
-fn common_bit_for_index(report: &Vec<String>, index: usize, tie_breaker: u8, compare: fn(i32, i32) -> bool) -> u8 {
+fn matcher_bit_for_index(report: &Vec<String>, index: usize, tie_breaker: u8, compare: fn(i32, i32) -> bool) -> u8 {
     let mut counter = 0;
 
     for line in report {
@@ -98,23 +98,29 @@ pub fn get_power_report(report: &Vec<String>) -> PowerConsumption {
     return PowerConsumption {gamma: gamma_val, epsilon:epsilon_val}
 }
 
-fn find_match_as_value(entries: &Vec<String>, match_fn: fn(&Vec<String>, usize) -> u8) -> usize {
+fn find_match(entries: &Vec<String>, match_fn: fn(&Vec<String>, usize) -> u8) -> String {
     let mut working_set = entries.clone();
 
     for i in 0..entries.first().unwrap().len() {
         let match_bit = match_fn(&working_set, i);
         working_set = working_set.iter().filter(|entry| entry.as_bytes()[i] == match_bit as u8).cloned().collect();
         if working_set.len() == 1 {
-            let matched_entry = working_set.first().unwrap();
-            return usize::from_str_radix(matched_entry.as_str(), 2).unwrap();
+            return working_set.first().unwrap().clone();
         }
     }
     panic!("No matching pattern")
 }
 
+fn bit_string_as_usize(input: String) -> usize {
+    usize::from_str_radix(input.as_str(), 2).unwrap()
+}
+
 pub fn get_life_support_rating(report: &Vec<String>) -> LifeSupportRating {
-    let oxygen_rating = find_match_as_value(report, oxygen_matcher);
-    let co2_rating = find_match_as_value(report, co2_matcher);
+    let oxygen_rating_string = find_match(report, oxygen_matcher);
+    let oxygen_rating = bit_string_as_usize(oxygen_rating_string);
+
+    let co2_rating_string = find_match(report, co2_matcher);
+    let co2_rating = bit_string_as_usize(co2_rating_string);
 
     return LifeSupportRating{ oxygen_rating, co2_rating }
 }
