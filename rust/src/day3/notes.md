@@ -54,3 +54,23 @@ epsilon = map gamma -> gamma < 0 then 1 else 0
 ```
 
 *NOTE:* We don't need to invert epsilon, it's value will be 2^(bit_vec_length - 1) - gamma
+
+## Part 2
+
+We can borrow most common / least common functionality from part 1. 
+
+At first glance, this feels like a sequentional filtering based on prefix of most/least common bit pattern. 
+
+Ideally, this would be a simple filtering exercise based on full bit pattern but of course, this has to be more complicated :). 
+
+*NOTE:* D'Oh, my initial approach used previous work to identify the most/least common bits but in fact, part-2 requires recomputing this for each filtered collection step. 
+
+### Simple approach
+
+```
+Loop n-bit times (n = length of max
+
+
+collection = filtered collection
+if collection length == 1 return this string as matching value
+```

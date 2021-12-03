@@ -4,14 +4,27 @@ use derive_more::Display;
 
 #[derive(Debug, PartialEq, Display)]
 #[display(fmt = "\n gamma: {} \n epsilon: {} \n power: {} \n", gamma, epsilon, "self.power()")]
-pub struct PowerReport {
+pub struct PowerConsumption {
     gamma: usize,
     epsilon: usize
 }
 
-impl PowerReport {
+impl PowerConsumption {
     pub fn power(&self) -> usize {
         &self.gamma * &self.epsilon
+    }
+}
+
+#[derive(Debug, PartialEq, Display)]
+#[display(fmt = "\n oxygen rating: {} \n c02 rating: {} \n rating: {} \n", oxygen_rating, co2_rating, "self.rating()")]
+pub struct LifeSupportRating {
+    oxygen_rating: usize,
+    co2_rating: usize
+}
+
+impl LifeSupportRating {
+    pub fn rating(&self) -> usize {
+        &self.oxygen_rating * &self.co2_rating
     }
 }
 
@@ -25,14 +38,21 @@ mod tests {
     }
 
     #[test]
-    fn test_sample_report() {
+    fn test_sample_power_report() {
         let input = get_sample_input();
         let power_report = get_power_report(&input);
-        assert_eq!(PowerReport{gamma: 22, epsilon: 9}, power_report)
+        assert_eq!(PowerConsumption {gamma: 22, epsilon: 9}, power_report)
+    }
+
+    #[test]
+    fn test_sample_life_support_rating() {
+        let input = get_sample_input();
+        let life_support_rating = get_life_support_rating(&input);
+        assert_eq!(LifeSupportRating {oxygen_rating: 23, co2_rating: 10}, life_support_rating)
     }
 }
 
-pub fn get_power_report(report: &Vec<String>) -> PowerReport {
+fn most_common_bits(report: &Vec<String>) -> String {
     let mut counters = vec![0; report[0].len()];
 
     for line in report {
@@ -40,12 +60,61 @@ pub fn get_power_report(report: &Vec<String>) -> PowerReport {
             counters[i] += if bit == '0' {-1} else {1};
         }
     }
+    counters.iter().map(|bit_sum| if *bit_sum >= 0 {"1"} else {"0"}).collect()
+}
 
-    let gamma_str: String = counters.iter().map(|bit_sum| if *bit_sum > 0 {"1"} else {"0"}).collect();
+fn oxygen_matcher(report: &Vec<String>, index: usize) -> u8 {
+    fn compare(first: i32, second: i32) -> bool {
+        return first < second
+    }
+    common_bit_for_index(report, index, '1' as u8, compare)
+}
+
+fn co2_matcher(report: &Vec<String>, index: usize) -> u8 {
+    fn compare(first: i32, second: i32) -> bool {
+        return first > second
+    }
+    common_bit_for_index(report, index, '0' as u8, compare)
+}
+
+fn common_bit_for_index(report: &Vec<String>, index: usize, tie_breaker: u8, compare: fn(i32, i32) -> bool) -> u8 {
+    let mut counter = 0;
+
+    for line in report {
+        counter += if line.chars().nth(index).unwrap() == '0' {-1} else {1};
+    }
+    if counter == 0 { tie_breaker.clone() } else { if compare(counter, 0) {'0' as u8} else {'1' as u8} }
+}
+
+fn least_common_bits(most_common_bits: &String) -> String {
+    most_common_bits.chars().map(|bit_char| if bit_char == '0' {'1'} else {'0'}).collect()
+}
+
+pub fn get_power_report(report: &Vec<String>) -> PowerConsumption {
+    let gamma_str = most_common_bits(report);
     let gamma_val = usize::from_str_radix(gamma_str.as_str(), 2).unwrap();
+    let epsilon_val: usize = (2_usize.pow(gamma_str.len() as u32) - gamma_val - 1) as usize;
 
-    let base: usize = 2;
-    let epsilon_val: usize = base.pow(counters.len() as u32) - gamma_val - 1;
+    return PowerConsumption {gamma: gamma_val, epsilon:epsilon_val}
+}
 
-    return PowerReport{gamma: gamma_val, epsilon:epsilon_val}
+fn find_match_as_value(entries: &Vec<String>, match_fn: fn(&Vec<String>, usize) -> u8) -> usize {
+    let mut working_set = entries.clone();
+
+    for i in 0..entries.first().unwrap().len() {
+        let match_bit = match_fn(&working_set, i);
+        working_set = working_set.iter().filter(|entry| entry.as_bytes()[i] == match_bit as u8).cloned().collect();
+        if working_set.len() == 1 {
+            let matched_entry = working_set.first().unwrap();
+            return usize::from_str_radix(matched_entry.as_str(), 2).unwrap();
+        }
+    }
+    panic!("No matching pattern")
+}
+
+pub fn get_life_support_rating(report: &Vec<String>) -> LifeSupportRating {
+    let oxygen_rating = find_match_as_value(report, oxygen_matcher);
+    let co2_rating = find_match_as_value(report, co2_matcher);
+
+    return LifeSupportRating{ oxygen_rating, co2_rating }
 }

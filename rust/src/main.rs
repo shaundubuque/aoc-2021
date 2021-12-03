@@ -43,6 +43,10 @@ fn run_day3() {
     let report = util::read_input::<String>("inputs/day3.txt");
     let power_report = day3::get_power_report(&report);
     println!("Power Report {}", power_report);
+
+    let report = util::read_input::<String>("inputs/day3.txt");
+    let life_support_rating = day3::get_life_support_rating(&report);
+    println!("Life Support Rating {}", life_support_rating);
 }
 
 fn main() {
