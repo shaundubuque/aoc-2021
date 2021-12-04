@@ -18,3 +18,7 @@ where
         })
         .collect()
 }
+
+pub fn to_string_vec(input: Vec<&str>) -> Vec<String> {
+    input.iter().map(|x| x.to_string()).collect::<Vec<String>>()
+}

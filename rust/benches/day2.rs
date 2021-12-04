@@ -1,7 +1,7 @@
 use aoc_2021_rust;
 
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use aoc_2021_rust::day2::Move;
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 pub fn day2_part1(c: &mut Criterion) {
     let input = aoc_2021_rust::util::read_input::<Move>("inputs/day2.txt");
@@ -17,9 +17,5 @@ pub fn day2_part2(c: &mut Criterion) {
     });
 }
 
-criterion_group!(
-    benches,
-    day2_part1,
-    day2_part2,
-);
+criterion_group!(benches, day2_part1, day2_part2,);
 criterion_main!(benches);

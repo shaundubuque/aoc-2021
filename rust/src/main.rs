@@ -5,6 +5,7 @@ use crate::day2::{exec_moves, exec_moves_with_aim, Move};
 mod day1;
 mod day2;
 mod day3;
+mod day4;
 mod util;
 
 fn run_day_1() {

@@ -18,7 +18,13 @@ pub struct Move {
 }
 
 #[derive(Debug, Display)]
-#[display(fmt = "\n x: {} \n aim: {} \n depth: {} \n total: {}", x, aim, depth, "x*depth")]
+#[display(
+    fmt = "\n x: {} \n aim: {} \n depth: {} \n total: {}",
+    x,
+    aim,
+    depth,
+    "x*depth"
+)]
 pub struct SubPosition {
     x: i32,
     aim: i32,
@@ -103,7 +109,11 @@ mod tests {
 }
 
 pub fn exec_moves(moves: &Vec<Move>) -> SubPosition {
-    let mut sub_position = SubPosition { x: 0, aim: 0, depth: 0 };
+    let mut sub_position = SubPosition {
+        x: 0,
+        aim: 0,
+        depth: 0,
+    };
 
     for sub_move in moves {
         match sub_move.command {
@@ -116,20 +126,22 @@ pub fn exec_moves(moves: &Vec<Move>) -> SubPosition {
 }
 
 pub fn exec_moves_with_aim(moves: &Vec<Move>) -> SubPosition {
-    let mut sub_position = SubPosition { x: 0, aim: 0, depth: 0 };
+    let mut sub_position = SubPosition {
+        x: 0,
+        aim: 0,
+        depth: 0,
+    };
 
     for sub_move in moves {
         match sub_move.command {
             Command::Forward => {
                 sub_position.x += sub_move.value;
                 sub_position.depth += sub_move.value * sub_position.aim;
-            },
+            }
             Command::Down => {
                 sub_position.aim += sub_move.value;
-            },
-            Command::Up => {
-                sub_position.aim -= sub_move.value
-            },
+            }
+            Command::Up => sub_position.aim -= sub_move.value,
         }
     }
     sub_position
