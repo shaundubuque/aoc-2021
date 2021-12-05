@@ -50,8 +50,16 @@ fn run_day3() {
     println!("Life Support Rating {}", life_support_rating);
 }
 
+fn run_day4() {
+    let input = util::read_input::<String>("inputs/day4.txt");
+    let game_config = day4::parse_input(input);
+    let score = day4::run_game(game_config);
+    println!("Board Score: {}", score);
+}
+
 fn main() {
     // run_day_1();
     // run_day2();
-    run_day3();
+    // run_day3();
+    run_day4();
 }
