@@ -1,11 +1,13 @@
 #![allow(dead_code)]
 
+use day5::VentLine;
 use crate::day2::{exec_moves, exec_moves_with_aim, Move};
 
 mod day1;
 mod day2;
 mod day3;
 mod day4;
+mod day5;
 mod util;
 
 fn run_day_1() {
@@ -53,13 +55,29 @@ fn run_day3() {
 fn run_day4() {
     let input = util::read_input::<String>("inputs/day4.txt");
     let game_config = day4::parse_input(input);
-    let score = day4::run_game(game_config);
-    println!("Board Score: {}", score);
+    let score = day4::run_game_part1(game_config);
+    println!("PART1 :: Board Score: {}", score);
+
+    let input = util::read_input::<String>("inputs/day4.txt");
+    let game_config = day4::parse_input(input);
+    let score = day4::run_game_part2(game_config);
+    println!("PART2 :: Board Score: {}", score);
+}
+
+fn run_day5() {
+    let input = util::read_input::<VentLine>("inputs/day5.txt");
+    let score = day5::run_part1(input);
+    println!("PART1 :: Num Overlapping: {}", score);
+
+    let input = util::read_input::<VentLine>("inputs/day5.txt");
+    let score = day5::run_part2(input);
+    println!("PART2 :: Num Overlapping: {}", score);
 }
 
 fn main() {
     // run_day_1();
     // run_day2();
     // run_day3();
-    run_day4();
+    // run_day4();
+    run_day5();
 }

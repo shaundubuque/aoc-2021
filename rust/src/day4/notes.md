@@ -37,5 +37,8 @@ First thought to keep things efficient, though maybe not simple, is to use a has
 - Checking board completion is O(1) (done when marking selection)
 - Summing non-selected entries of winning board is O(n) where n < m*m
 
+*STUMBLES* 
+I ran into a couple of stumbling blocks when solving for part2 based on some simplifying assumptions made in solving part1, namely, that only a single board would win for each selection. 
+
 
 

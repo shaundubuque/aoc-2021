@@ -65,11 +65,19 @@ mod tests {
     }
 
     #[test]
-    fn test_run_sample_game() {
+    fn test_run_sample_game_part1() {
         let input = get_sample_input();
         let game_config = parse_input(input);
-        let score = run_game(game_config);
+        let score = run_game_part1(game_config);
         assert_eq!(4512, score);
+    }
+
+    #[test]
+    fn test_run_sample_game_part2() {
+        let input = get_sample_input();
+        let game_config = parse_input(input);
+        let score = run_game_part2(game_config);
+        assert_eq!(1924, score);
     }
 }
 
@@ -96,35 +104,52 @@ fn game_state_from_config(config: RawConfig) -> GameState {
     GameState{ selections: config.selections, boards, rows, cols}
 }
 
-fn sum_of_unselected(board: HashMap<String, (usize, usize)>) -> usize {
+fn game_state_from_config_part2(config: RawConfig) -> GameState2 {
+    let mut boards: HashMap<usize, HashMap<String, (usize,usize)>> = HashMap::new();
+    let mut rows: Vec<Vec<usize>> = vec![];
+    let mut cols: Vec<Vec<usize>> = vec![];
+
+    for (board_idx, board) in config.boards.iter().enumerate() {
+        let board_rows = vec![0;5];
+        let board_cols = vec![0;5];
+        let mut board_map: HashMap<String, (usize, usize)> = HashMap::new();
+
+        for (row_num, line) in board.iter().enumerate() {
+            let row = parse_line_as_row(line);
+            for (col_num, col) in row.iter().enumerate() {
+                board_map.insert(col.clone(), (row_num, col_num));
+            }
+        }
+        boards.insert(board_idx, board_map);
+        rows.push(board_rows);
+        cols.push(board_cols);
+    }
+    GameState2{ selections: config.selections, boards, rows, cols}
+}
+
+fn sum_of_unselected(board: &HashMap<String, (usize, usize)>) -> usize {
     board.keys().map(|num_string| num_string.parse::<usize>().unwrap()).sum()
 }
 
-pub fn run_game(config: RawConfig) -> usize {
-
-    // Need to build up board state so we can process selections
-    let game_state = game_state_from_config(config);
-    let selections = game_state.selections;
-
-    let mut boards = game_state.boards;
-    let mut rows = game_state.rows;
-    let mut cols = game_state.cols;
+pub fn run_game_part1(config: RawConfig) -> usize {
+    // Run until a board wins
+    let mut game_state = game_state_from_config(config);
 
     // Step through selections, checking each boards row/cols as we go
     let mut winning_number: usize = 0;
     let mut winning_selection:Option<String> = None;
     let mut winning_board: HashMap<String, (usize, usize)> = HashMap::new();
-    'game_loop: for selection in selections {
-        for (board_idx, board) in boards.iter_mut().enumerate() {
+    'game_loop: for selection in game_state.selections {
+        for (board_idx, board) in game_state.boards.iter_mut().enumerate() {
             // check to see if selection exists in map
             let key = selection.as_str();
             if let Some(bingo_counters) = board.get(key) {
                 let (r, c) = *bingo_counters;
-                if rows[board_idx][r] == WIN_COUNT - 1 || cols[board_idx][c] == WIN_COUNT - 1 {
+                if game_state.rows[board_idx][r] == WIN_COUNT - 1 || game_state.cols[board_idx][c] == WIN_COUNT - 1 {
                     winning_selection = Some(selection.clone());
                 } else {
-                    rows[board_idx][r] += 1;
-                    cols[board_idx][c] += 1;
+                    game_state.rows[board_idx][r] += 1;
+                    game_state.cols[board_idx][c] += 1;
                 }
             }
             board.remove(key);
@@ -135,9 +160,70 @@ pub fn run_game(config: RawConfig) -> usize {
             }
         }
     }
-    let board_score = sum_of_unselected(winning_board) * winning_number;
-    println!("Score w/winning board: {}", board_score);
+    let board_score = sum_of_unselected(&winning_board) * winning_number;
     board_score
+}
+
+pub fn run_game_part2(config: RawConfig) -> usize {
+    // run until there is only 1 board left
+    let mut game_state = game_state_from_config_part2(config);
+
+    // Step through selections, checking each boards row/cols as we go
+    let mut winning_number: usize = 0;
+    let mut winning_selection:Option<String> = None;
+    let mut winning_boards: Option<Vec<usize>> = Some(vec![]);
+    let mut winning_board: HashMap<String, (usize, usize)> = HashMap::new();
+
+    for selection in game_state.selections {
+        if let None = winning_boards {
+            // Do nothing (ugly fix for issue with borrowing when using `if let Some(w_boards)`
+            // TODO: Revisit to clean up and understand root cause of compiler error
+        } else {
+            for idx in winning_boards.unwrap() {
+                game_state.boards.remove(&idx);
+            }
+            winning_boards = None;
+        }
+        let keys: Vec<usize> = game_state.boards.keys().cloned().collect();
+        for board_idx in keys {
+            let board = game_state.boards.get_mut(&board_idx).unwrap();
+            // check to see if selection exists in map
+            let key = selection.as_str();
+            if let Some(bingo_counters) = board.get(key) {
+                let (r, c) = *bingo_counters;
+                if game_state.rows[board_idx][r] == WIN_COUNT - 1 || game_state.cols[board_idx][c] == WIN_COUNT - 1 {
+                    winning_selection = Some(selection.clone());
+                } else {
+                    game_state.rows[board_idx][r] += 1;
+                    game_state.cols[board_idx][c] += 1;
+                }
+            }
+            board.remove(key);
+
+            if let Some(last_selection) = winning_selection.clone()  {
+
+                if let None = winning_boards {
+                    winning_boards = Some(vec![board_idx]);
+                } else {
+                    let mut w_boards = winning_boards.unwrap();
+                    w_boards.push(board_idx);
+                    winning_boards = Some(w_boards)
+                }
+
+                winning_number = last_selection.parse::<usize>().unwrap();
+                winning_board = board.clone();
+                winning_selection = None;
+            }
+        }
+    }
+
+    let board_score = sum_of_unselected(&winning_board);
+    let final_score = board_score * winning_number;
+    println!("Winning Board: {:?}", &winning_board);
+    println!("Board Score: {}", board_score);
+    println!("Last Selection: {}", winning_number);
+    println!("Final Score: {}", final_score);
+    final_score
 }
 
 #[derive(Debug, PartialEq, Display)]
@@ -156,6 +242,14 @@ struct GameState {
     cols: Vec<Vec<usize>>,
 }
 
+#[derive(Debug, PartialEq, Display)]
+#[display(fmt = "\n Selections: {:?} \n Boards: {:?}", selections, boards)]
+struct GameState2 {
+    selections: Vec<String>,
+    boards: HashMap<usize, HashMap<String, (usize,usize)>>,
+    rows: Vec<Vec<usize>>,
+    cols: Vec<Vec<usize>>,
+}
 
 fn parse_line_as_row(line: &String) -> Vec<String> {
     to_string_vec(line.split_whitespace().collect())
@@ -185,6 +279,5 @@ pub fn parse_input(input: Vec<String>) -> RawConfig {
     boards.push(curr_board);
 
     let parsed_input = RawConfig { selections, boards };
-    println!("ParsedInput: {}", parsed_input);
     parsed_input
 }
