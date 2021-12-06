@@ -2,12 +2,14 @@
 
 use day5::VentLine;
 use crate::day2::{exec_moves, exec_moves_with_aim, Move};
+use crate::day6::{parse_state, run_eff_simulation, run_simulation};
 
 mod day1;
 mod day2;
 mod day3;
 mod day4;
 mod day5;
+mod day6;
 mod util;
 
 fn run_day_1() {
@@ -74,10 +76,23 @@ fn run_day5() {
     println!("PART2 :: Num Overlapping: {}", score);
 }
 
+fn run_day6() {
+    let input = util::read_input::<String>("inputs/day6.txt");
+    let init_state = parse_state(input);
+    let num_fish = run_simulation(init_state, 80);
+    println!("PART1 :: Num Fish: {}", num_fish);
+
+    let input = util::read_input::<String>("inputs/day6.txt");
+    let init_state = parse_state(input);
+    let num_fish = run_eff_simulation(init_state, 256);
+    println!("PART2 :: Num Fish: {}", num_fish);
+}
+
 fn main() {
     // run_day_1();
     // run_day2();
     // run_day3();
     // run_day4();
-    run_day5();
+    // run_day5();
+    run_day6();
 }
