@@ -60,6 +60,27 @@ mod tests {
         let num_fish = run_eff_simulation(init_state.clone(), 256);
         assert_eq!(26984457539, num_fish);
     }
+
+    #[test]
+    fn test_simple_simulation() {
+        let input = util::read_input::<String>("inputs/day6_sample.txt");
+        let init_state = parse_state(input);
+
+        let num_fish = run_simple_simulation(init_state.clone(), 1);
+        assert_eq!(5, num_fish);
+
+        let num_fish = run_simple_simulation(init_state.clone(), 2);
+        assert_eq!(6, num_fish);
+
+        let num_fish = run_simple_simulation(init_state.clone(), 18);
+        assert_eq!(26, num_fish);
+
+        let num_fish = run_simple_simulation(init_state.clone(), 80);
+        assert_eq!(5934, num_fish);
+
+        let num_fish = run_simple_simulation(init_state.clone(), 256);
+        assert_eq!(26984457539, num_fish);
+    }
 }
 
 pub fn parse_state(input: Vec<String>) -> Vec<usize> {
@@ -156,5 +177,27 @@ pub fn run_eff_simulation(init_state: Vec<usize>, days: usize) -> usize {
         lifecycle_groups = new_groups;
     }
     lifecycle_groups.values().sum()
+}
+
+pub fn run_simple_simulation(init_state: Vec<usize>, days: usize) -> usize {
+    // Create lantern fish for each value in init_state
+
+    let max_age = 8;
+    let mut lifecycle_groups = vec![0;max_age+1];
+
+    for key in init_state {
+        lifecycle_groups[key] += 1;
+    }
+
+    for _ in 0..days {
+        let num_births = lifecycle_groups[0];
+
+        for i in 0..=(max_age - 1) {
+            lifecycle_groups[i] = lifecycle_groups[i+1];
+        }
+        lifecycle_groups[6] += num_births;
+        lifecycle_groups[8] = num_births;
+    }
+    lifecycle_groups.iter().sum()
 }
 

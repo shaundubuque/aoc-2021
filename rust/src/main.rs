@@ -2,7 +2,7 @@
 
 use day5::VentLine;
 use crate::day2::{exec_moves, exec_moves_with_aim, Move};
-use crate::day6::{parse_state, run_eff_simulation, run_simulation};
+use crate::day6::{parse_state, run_eff_simulation, run_simple_simulation, run_simulation};
 
 mod day1;
 mod day2;
@@ -86,6 +86,11 @@ fn run_day6() {
     let init_state = parse_state(input);
     let num_fish = run_eff_simulation(init_state, 256);
     println!("PART2 :: Num Fish: {}", num_fish);
+
+    let input = util::read_input::<String>("inputs/day6.txt");
+    let init_state = parse_state(input);
+    let num_fish = run_simple_simulation(init_state, 256);
+    println!("PART2 (Simple) :: Num Fish: {}", num_fish);
 }
 
 fn main() {
