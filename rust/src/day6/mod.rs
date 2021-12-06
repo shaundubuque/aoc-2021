@@ -180,18 +180,14 @@ pub fn run_eff_simulation(init_state: Vec<usize>, days: usize) -> usize {
 }
 
 pub fn run_simple_simulation(init_state: Vec<usize>, days: usize) -> usize {
-    // Create lantern fish for each value in init_state
-
     let max_age = 8;
     let mut lifecycle_groups = vec![0;max_age+1];
-
     for key in init_state {
         lifecycle_groups[key] += 1;
     }
 
     for _ in 0..days {
         let num_births = lifecycle_groups[0];
-
         for i in 0..=(max_age - 1) {
             lifecycle_groups[i] = lifecycle_groups[i+1];
         }
