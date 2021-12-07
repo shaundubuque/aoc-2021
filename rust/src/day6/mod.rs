@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 
 use std::collections::HashMap;
-use std::hash::Hash;
 
 #[cfg(test)]
 mod tests {

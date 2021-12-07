@@ -3,6 +3,7 @@
 use day5::VentLine;
 use crate::day2::{exec_moves, exec_moves_with_aim, Move};
 use crate::day6::{parse_state, run_eff_simulation, run_simple_simulation, run_simulation};
+use crate::day7::{constant_cost_for_move, find_best_position, fuel_for_new_position, inc_cost_for_move, parse_starting_positions};
 
 mod day1;
 mod day2;
@@ -10,6 +11,7 @@ mod day3;
 mod day4;
 mod day5;
 mod day6;
+mod day7;
 mod util;
 
 fn run_day_1() {
@@ -93,11 +95,23 @@ fn run_day6() {
     println!("PART2 (Simple) :: Num Fish: {}", num_fish);
 }
 
+fn run_day7() {
+    let input = util::read_input::<String>("inputs/day7.txt");
+    let starting_positions = parse_starting_positions(input);
+
+    let (best_position, fuel_needed) = find_best_position(&starting_positions, constant_cost_for_move);
+    println!("PART1 :: \n Best Position {}\n Fuel Needed: {}", best_position, fuel_needed);
+
+    let (best_position, fuel_needed) = find_best_position(&starting_positions, inc_cost_for_move);
+    println!("PART2 :: \n Best Position {}\n Fuel Needed: {}", best_position, fuel_needed);
+}
+
 fn main() {
     // run_day_1();
     // run_day2();
     // run_day3();
     // run_day4();
     // run_day5();
-    run_day6();
+    // run_day6();
+    run_day7();
 }
