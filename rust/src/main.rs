@@ -4,6 +4,7 @@ use day5::VentLine;
 use crate::day2::{exec_moves, exec_moves_with_aim, Move};
 use crate::day6::{parse_state, run_eff_simulation, run_simple_simulation, run_simulation};
 use crate::day7::{constant_cost_for_move, find_best_position, fuel_for_new_position, inc_cost_for_move, parse_starting_positions};
+use crate::day8::{count_unique_digits, Sequence};
 
 mod day1;
 mod day2;
@@ -12,6 +13,7 @@ mod day4;
 mod day5;
 mod day6;
 mod day7;
+mod day8;
 mod util;
 
 fn run_day_1() {
@@ -106,6 +108,12 @@ fn run_day7() {
     println!("PART2 :: \n Best Position {}\n Fuel Needed: {}", best_position, fuel_needed);
 }
 
+fn run_day8() {
+    let input = util::read_input::<Sequence>("inputs/day8.txt");
+    let num_unique_in_output = count_unique_digits(input);
+    println!("PART1 :: Count of unique digit appearance in output: {}", num_unique_in_output);
+}
+
 fn main() {
     // run_day_1();
     // run_day2();
@@ -113,5 +121,6 @@ fn main() {
     // run_day4();
     // run_day5();
     // run_day6();
-    run_day7();
+    // run_day7();
+    run_day8();
 }
